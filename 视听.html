@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particle Text Effect</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 添加背景音乐 -->
+    <audio id="backgroundMusic" autoplay loop>
+        <source src="your-music-file.mp3" type="audio/mpeg">
+        你的浏览器不支持音频播放。
+    </audio>
+    <canvas id="canvas"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const words = [
+            "去死吧", "滚蛋", "赶紧跳楼", "全家暴毙", "出门被车撞", "不得好死", "断子绝孙",
+            "你妈怎么没教你", "你爸是 ××", "咒全家死绝", "祖坟被刨", "祖宗十八代遭报应",
+            "砍死你", "捅死你", "活剐", "挫骨扬灰", "出门必遭横祸", "烂脸烂嘴", "全身流脓",
+            "你妈 ××", "你爸是狗", "你姐 / 妹是 ××", "丑八怪", "肥猪", "矮矬穷", "娘炮",
+            "恐龙", "癞蛤蟆", "整容怪", "脑残", "智障", "弱智", "idiot", "伞兵", "低能儿",
+            "废物", "loser", "婊子", "贱人", "slut", "人渣", "垃圾", "狗东西", "杂种",
+            "戏精", "绿茶婊", "白莲花", "圣母婊", "瞎子", "聋子", "瘸子", "哑巴", "畸形",
+            "脑淤血", "脑浆糊", "智熄", "睿智", "小脑没发育", "低智儿", "废物点心", "饭桶",
+            "吃干饭的", "心机婊", "圣母病", "作精", "杠精", "阴阳人", "傻 ×", "煞笔", "SB",
+            "CNM", "妈卖批", "Fuck off", "狗屁不通", "一坨屎",
+            "母狗", "公交车", "荡妇", "拜金女", "娘娘腔", "软饭男", "直男癌", "普信男",
+            "表子", "贱货", "骚货", "破鞋", "母夜叉", "黄脸婆", "生不出儿子", "软蛋",
+            "没屌用", "阳痿男", "基佬", "死玻璃", "蕾丝边", "变态", "恶心同性恋",
+            "老不死的", "老东西", "老逼登", "小屁孩", "乳臭未干", "黄口小儿", "穷酸样",
+            "凤凰男", "伏地魔", "富二代纨绔", "官二代狗仗人势", "喷子", "杠精", "蹭热度",
+            "炒作", "卖国贼", "汉奸", "精日 / 精美", "蹭热度狗", "博眼球无下限",
+            "想红想疯了", "恰烂钱", "收黑钱", "菜鸡", "垃圾操作", "退圈吧", "丢人现眼",
+            "慕洋犬", "跪族", "带路党"
+        ];
+        const particles = [];
+        const mouse = { x: null, y: null, radius: 100 };
+
+        class Particle {
+            constructor(x, y, text) {
+                this.x = x;
+                this.y = y;
+                this.size = 20;
+                this.text = text;
+                this.baseX = this.x;
+                this.baseY = this.y;
+                this.density = (Math.random() * 30) + 1;
+                this.opacity = 0;
+            }
+
+            draw() {
+                // 将文字颜色改为白色
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.font = `${this.size}px Arial`;
+                ctx.fillText(this.text, this.x, this.y);
+            }
+
+            update() {
+                if (this.opacity < 1) {
+                    this.opacity += 0.02;
+                }
+            }
+        }
+
+        function init() {
+            particles.length = 0;
+            for (let i = 0; i < words.length; i++) {
+                let x = Math.random() * canvas.width;
+                let y = Math.random() * canvas.height;
+                setTimeout(() => {
+                    particles.push(new Particle(x, y, words[i]));
+                }, i * 500);
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].draw();
+                particles[i].update();
+            }
+            requestAnimationFrame(animate);
+        }
+
+        window.addEventListener('mousemove', (event) => {
+            mouse.x = event.x;
+            mouse.y = event.y;
+        });
+
+        window.addEventListener('click', (event) => {
+            particles.forEach(particle => {
+                let dx = event.x - particle.x;
+                let dy = event.y - particle.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < particle.size) {
+                    alert(`"${particle.text}" 在网上的使用次数: ${Math.floor(Math.random() * 1000)}`);
+                }
+            });
+        });
+
+        init();
+        animate();
+    </script>
+    <div id="counter" style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); color: white; font-size: 24px;">
+        此刻正在发生的网络暴力事件: <span id="count">0</span>
+    </div>
+    <script>
+        let count = 0;
+        const countElement = document.getElementById('count');
+
+        function updateCounter() {
+            count += Math.floor(Math.random() * 10) + 1;
+            countElement.textContent = count;
+        }
+
+        setInterval(updateCounter, 3000);
+    </script>
+    <button id="truthButton" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0; background-color: white; border: none; padding: 10px 20px; font-size: 24px; cursor: pointer; transition: opacity 2s; border-radius: 9999px;">你真的了解网络暴力吗？</button>
+    <script>
+        const truthButton = document.getElementById('truthButton');
+
+        setTimeout(() => {
+            truthButton.style.opacity = 1;
+        }, 60000);
+
+        truthButton.addEventListener('click', () => {
+            const glassBreak = new Audio('glass-break.mp3');
+            glassBreak.play();
+            const glassBreakAnimation = document.createElement('div');
+            glassBreakAnimation.style.position = 'fixed';
+            glassBreakAnimation.style.top = 0;
+            glassBreakAnimation.style.left = 0;
+            glassBreakAnimation.style.width = '100%';
+            glassBreakAnimation.style.height = '100%';
+            glassBreakAnimation.style.backgroundImage = 'url("glass-break.png")';
+            glassBreakAnimation.style.backgroundSize = 'cover';
+            glassBreakAnimation.style.opacity = 0;
+            glassBreakAnimation.style.transition = 'opacity 1s';
+            document.body.appendChild(glassBreakAnimation);
+            setTimeout(() => {
+                glassBreakAnimation.style.opacity = 1;
+            }, 0);
+            setTimeout(() => {
+                window.location.href = '网络暴力介绍.html';
+            }, 1000);
+        });
+    </script>
+</body>
+
+</html>
+    
